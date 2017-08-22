@@ -16,9 +16,9 @@ schema_Ftrips = 'route_id trip_id trip_headsign'
 schema_Froutes = 'route_id agency_id route_short_name route_desc'
 # schema_stop_times = 'trip_id arrival_time departure_time stop_id stop_sequence stop_headsign pickup_type drop_off_type shape_dist_traveled'
 schema_stop_times = 'trip_id stop_id'
-file_list = ['/data/MIDS_w205_FinalProject/raw_data/bus/Fstops_noH.txt',
-             '/data/MIDS_w205_FinalProject/raw_data/bus/Ftrips_noH.txt',
-             '/data/MIDS_w205_FinalProject/raw_data/bus/Froutes_noH.txt',
+file_list = ['/data/MIDS_w205_FinalProject/raw_data/bus/stops_noH.txt',
+             '/data/MIDS_w205_FinalProject/raw_data/bus/trips_noH.txt',
+             '/data/MIDS_w205_FinalProject/raw_data/bus/routes_noH.txt',
              '/data/MIDS_w205_FinalProject/raw_data/bus/stop_times_noH.txt']
 hdfs_str_start = 'file://'
 
@@ -29,21 +29,21 @@ for file in file_list:
     print temp_file_loc
     lines_temp = sc.textFile(temp_file_loc)
     row_split = lines_temp.map(lambda l: l.split(','))
-    if 'Fstops_noH' in file:
+    if 'stops_noH' in file:
         # column_map = row_split.map(lambda p: (p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10]))
         column_map = row_split.map(lambda p: (p[0], p[2], p[4], p[5]))
         fields = [StructField(field_name, StringType(), True) for field_name in schema_Fstops.split()]
         schema = StructType(fields)
         schema_data_temp = sqlContext.createDataFrame(column_map, schema)
         schema_data_temp.registerTempTable(temp_data_name)
-    if 'Ftrips_noH' in file:
+    if 'trips_noH' in file:
         # column_map = row_split.map(lambda p: (p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9]))
         column_map = row_split.map(lambda p: (p[0], p[2], p[3]))
         fields = [StructField(field_name, StringType(), True) for field_name in schema_Ftrips.split()]
         schema = StructType(fields)
         schema_data_temp = sqlContext.createDataFrame(column_map, schema)
         schema_data_temp.registerTempTable(temp_data_name)
-    if 'Froutes_noH' in file:
+    if 'routes_noH' in file:
         # column_map = row_split.map(lambda p: (p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8]))
         column_map = row_split.map(lambda p: (p[0], p[1], p[2], p[4]))
         fields = [StructField(field_name, StringType(), True) for field_name in schema_Froutes.split()]
@@ -58,12 +58,12 @@ for file in file_list:
         schema_data_temp = sqlContext.createDataFrame(column_map, schema)
         schema_data_temp.registerTempTable(temp_data_name)
 
-Ftrips_df = sqlContext.sql('select * FROM  Ftrips_temp')
-Froutes_df = sqlContext.sql('select * FROM  Froutes_temp')
+Ftrips_df = sqlContext.sql('select * FROM  trips_temp')
+Froutes_df = sqlContext.sql('select * FROM  routes_temp')
 stop_times_df = sqlContext.sql('select * FROM  stop_times_temp')
-Fstops_df = sqlContext.sql('select * FROM  Fstops_temp')
+Fstops_df = sqlContext.sql('select * FROM  stops_temp')
 
-bus_stop = sqlContext.sql('select * FROM Fstops_temp WHERE stop_id = 1110')
+bus_stop = sqlContext.sql('select * FROM stops_temp WHERE stop_id = 1110')
 # bus_stop.show()
 
 bus_stop_info = {}
